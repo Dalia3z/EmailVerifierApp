@@ -75,14 +75,19 @@ fun MainScreen() {
                         onClick = { selectedTab = 1 },
                         text = { Text("Phone Validator") },
                     )
+                    Tab(
+                        selected = selectedTab == 2,
+                        onClick = { selectedTab = 2 },
+                        text = { Text("Campaigns") },
+                    )
                 }
             }
         },
     ) { innerPadding ->
-        if (selectedTab == 0) {
-            EmailVerifierContent(modifier = Modifier.padding(innerPadding))
-        } else {
-            PhoneScreen(modifier = Modifier.padding(innerPadding))
+        when (selectedTab) {
+            0 -> EmailVerifierContent(modifier = Modifier.padding(innerPadding))
+            1 -> PhoneScreen(modifier = Modifier.padding(innerPadding))
+            else -> CampaignScreen(modifier = Modifier.padding(innerPadding))
         }
     }
 }
