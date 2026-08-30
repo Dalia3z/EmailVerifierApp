@@ -10,6 +10,7 @@ import com.example.emailverifier.data.source.BackendSettings
 import com.example.emailverifier.data.source.CampaignApi
 import com.example.emailverifier.domain.model.VerificationStatus
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -22,7 +23,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /** Default professional HTML template (the server replaces {{unsubscribe_url}}). */
-private const val DEFAULT_TEMPLATE = """
+private val DEFAULT_TEMPLATE = """
     <div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;padding:24px;color:#1a1c1e">
       <h2 style="color:#1a6feb">Hello!</h2>
       <p>We're excited to share our latest update with you.</p>
@@ -153,7 +154,7 @@ class CampaignViewModel(application: Application) : AndroidViewModel(application
 
     /** Polls the backend every 5s until the campaign reaches a terminal state. */
     private suspend fun pollStatus(campaignId: String) {
-        while (isActive) {
+        while (currentCoroutineContext().isActive) {
             delay(5_000)
             try {
                 val s = _uiState.value
