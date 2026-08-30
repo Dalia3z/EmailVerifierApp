@@ -3,6 +3,7 @@ package com.example.emailverifier.domain
 import com.example.emailverifier.data.local.EmailEntity
 import com.example.emailverifier.data.repository.EmailRepository
 import com.example.emailverifier.data.source.VerifierProvider
+import com.example.emailverifier.domain.model.EmailFormat
 import com.example.emailverifier.domain.model.VerificationStatus
 import io.github.mbalatsko.emailverifier.EmailVerifier
 import kotlinx.coroutines.CancellationException
@@ -81,10 +82,12 @@ class VerificationService(
             // ---- local pre-check: reject addresses the verifier cannot handle ----
             // emailverifier-kt internally calls java.net.IDN.toASCII() while parsing
             // the domain, which throws IllegalArgumentException ("Invalid input to
-            // toASCII: ...") for characters that cannot be converted (e.g. Arabic
-            // letters/emoji in some Unicode ranges). Instead of letting that exception
-            // surface, we classify such emails locally as a syntax error and continue.
-            if (!isAsciiOnly(entity.email)) {
+            // toASCII: ...") for characters that cannot be converted (e.g. Arabic /
+            // Thai / emoji in some Unicode ranges, spaces, control chars...).
+            // CsvParser already filters these at import time; this check is a second
+            // layer of defense for PENDING rows imported by older builds. We classify
+            // such emails as a syntax error (INVALID) and continue.
+            if (!EmailFormat.isValid(entity.email)) {
                 repository.saveResult(
                     entity.id,
                     VerificationStatus.INVALID,
@@ -120,7 +123,4 @@ class VerificationService(
             repository.saveResult(entity.id, VerificationStatus.FAILED, "Verification error: $detail")
         }
     }
-
-    /** True when the string contains only ASCII characters (code < 128). */
-    private fun isAsciiOnly(value: String): Boolean = value.all { it.code < 128 }
 }

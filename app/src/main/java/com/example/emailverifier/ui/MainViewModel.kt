@@ -104,17 +104,24 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             _uiState.update { it.copy(phase = UiState.Phase.VERIFYING, message = "Importing file…") }
             try {
                 // Parsing 10k lines is IO-bound: never do it on the main thread.
-                val emails = withContext(Dispatchers.IO) {
+                // parseEmails() also applies a strict format filter, so malformed /
+                // non-ASCII lines are skipped here and can never reach the verifier.
+                val parsed = withContext(Dispatchers.IO) {
                     getApplication<Application>().contentResolver.openInputStream(uri)
                         ?.use { CsvParser.parseEmails(it) }
                 } ?: throw IllegalStateException("Cannot open the selected file")
 
-                if (emails.isEmpty()) throw IllegalStateException("No email addresses found in the file")
+                if (parsed.emails.isEmpty()) throw IllegalStateException("No valid email addresses found in the file")
 
                 // Start a fresh batch: wipe the old database, insert the new list.
                 repository.clearAll()
-                repository.importEmails(emails)
-                _uiState.update { it.copy(message = "Imported ${emails.size} emails. Verifying…") }
+                repository.importEmails(parsed.emails)
+                _uiState.update {
+                    it.copy(
+                        message = "Imported ${parsed.emails.size} emails " +
+                            "(${parsed.skipped} invalid lines skipped). Verifying…",
+                    )
+                }
 
                 service.verifyAllPending()
                 _uiState.update { it.copy(phase = UiState.Phase.DONE, message = "Verification finished.") }
