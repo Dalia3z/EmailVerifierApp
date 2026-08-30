@@ -78,6 +78,21 @@ class VerificationService(
             }
             currentCoroutineContext().ensureActive()
 
+            // ---- local pre-check: reject addresses the verifier cannot handle ----
+            // emailverifier-kt internally calls java.net.IDN.toASCII() while parsing
+            // the domain, which throws IllegalArgumentException ("Invalid input to
+            // toASCII: ...") for characters that cannot be converted (e.g. Arabic
+            // letters/emoji in some Unicode ranges). Instead of letting that exception
+            // surface, we classify such emails locally as a syntax error and continue.
+            if (!isAsciiOnly(entity.email)) {
+                repository.saveResult(
+                    entity.id,
+                    VerificationStatus.INVALID,
+                    "Invalid email syntax (non-ASCII or unsupported characters)",
+                )
+                return
+            }
+
             // ---- run the actual verification ----
             // (the library catches per-check exceptions itself and returns
             //  CheckResult.Errored, so a single bad email can never crash us here)
@@ -88,6 +103,14 @@ class VerificationService(
             repository.saveResult(entity.id, status, reason)
         } catch (e: CancellationException) {
             throw e // never swallow cancellation
+        } catch (e: IllegalArgumentException) {
+            // Defensive net for any leftover parsing error (e.g. IDN.toASCII) on
+            // unusual input: record it as a syntax error (INVALID), not a crash.
+            repository.saveResult(
+                entity.id,
+                VerificationStatus.INVALID,
+                "Invalid email syntax: ${e.message ?: "unsupported characters"}",
+            )
         } catch (e: Exception) {
             // Timeout / IOException / any unexpected error => mark FAILED, continue.
             val detail = when (e) {
@@ -97,4 +120,7 @@ class VerificationService(
             repository.saveResult(entity.id, VerificationStatus.FAILED, "Verification error: $detail")
         }
     }
+
+    /** True when the string contains only ASCII characters (code < 128). */
+    private fun isAsciiOnly(value: String): Boolean = value.all { it.code < 128 }
 }
