@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Permissions strategy:
+  - INTERNET + ACCESS_NETWORK_STATE: required for SMTP checks, DNS-over-HTTPS (MX
+    lookup) and for downloading the Public Suffix List / disposable-domain lists.
+  - READ_EXTERNAL_STORAGE (maxSdk 32): NOT needed at runtime because the input file
+    is picked through the Storage Access Framework (SAF) which requires no permission.
+    It is declared only for completeness / pre-13 legacy flows.
+  - WRITE_EXTERNAL_STORAGE (maxSdk 28): only needed to export CSVs on API <= 28.
+    On API 29+ we export through MediaStore.Downloads which needs no permission.
+    On API 24-28 the app requests this permission at runtime (see MainScreen).
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+
+    <application
+        android:name=".EmailVerifierApplication"
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.EmailVerifierApp">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

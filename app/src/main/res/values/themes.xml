@@ -1,0 +1,7 @@
+<resources>
+    <!--
+      Base theme for the activity. We use a plain platform theme without an
+      ActionBar because the whole UI is rendered by Jetpack Compose (Material 3).
+    -->
+    <style name="Theme.EmailVerifierApp" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>
