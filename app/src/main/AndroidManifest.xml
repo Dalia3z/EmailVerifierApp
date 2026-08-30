@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   Permissions strategy:
-  - INTERNET + ACCESS_NETWORK_STATE: required for SMTP checks, DNS-over-HTTPS (MX
-    lookup) and for downloading the Public Suffix List / disposable-domain lists.
+  - INTERNET + ACCESS_NETWORK_STATE: required for SMTP checks and DNS-over-HTTPS
+    (MX lookup). The PSL / disposable-domain lists are BUNDLED inside the app and
+    require no network access at startup.
   - READ_EXTERNAL_STORAGE (maxSdk 32): NOT needed at runtime because the input file
     is picked through the Storage Access Framework (SAF) which requires no permission.
     It is declared only for completeness / pre-13 legacy flows.
