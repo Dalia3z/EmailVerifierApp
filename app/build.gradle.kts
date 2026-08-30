@@ -77,6 +77,9 @@ dependencies {
     // ---- CSV parsing / writing ----
     implementation(libs.opencsv)
 
+    // ---- Phone number validation (Google libphonenumber) ----
+    implementation(libs.libphonenumber)
+
     // ---- Email verification library + SLF4J binding + Ktor CIO engine ----
     // ktor-client-cio is declared explicitly so the network engine is guaranteed
     // on the compile AND runtime classpaths (the library also depends on it).

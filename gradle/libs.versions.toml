@@ -13,6 +13,7 @@ opencsv = "5.9"
 emailverifier = "1.0.0"
 slf4j = "2.0.13"
 ktor = "3.2.1"
+libphonenumber = "9.0.38"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -36,6 +37,7 @@ opencsv = { group = "com.opencsv", name = "opencsv", version.ref = "opencsv" }
 emailverifier-kt = { group = "io.github.mbalatsko", name = "emailverifier-kt", version.ref = "emailverifier" }
 slf4j-simple = { group = "org.slf4j", name = "slf4j-simple", version.ref = "slf4j" }
 ktor-client-cio = { group = "io.ktor", name = "ktor-client-cio", version.ref = "ktor" }
+libphonenumber = { group = "com.googlecode.libphonenumber", name = "libphonenumber", version.ref = "libphonenumber" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -42,7 +42,7 @@ object CsvExporter {
         }
     }
 
-    private fun writeCsv(
+    internal fun writeCsv(
         context: Context,
         fileName: String,
         block: (CSVWriter) -> Unit,
@@ -106,4 +106,7 @@ object CsvExporter {
 
     private fun timestamp(): String =
         SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
+
+    /** Shared file-name time suffix (used by [PhoneCsvExporter]). */
+    fun timestampSuffix(): String = timestamp()
 }
