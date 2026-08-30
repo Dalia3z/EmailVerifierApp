@@ -20,6 +20,11 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
+    - name: Write build info
+      run: |
+        mkdir -p app/src/main/assets
+        printf 'run=%s\nsha=%s\n' "${{ github.run_number }}" "${{ github.sha }}" > app/src/main/assets/build-info.txt
+
     - name: Build Debug APK
       run: ./gradlew assembleDebug
 
